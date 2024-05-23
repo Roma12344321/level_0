@@ -1,0 +1,9 @@
+database:
+  user: "postgres"
+  password: "*****"
+  dbname: "level_0"
+  sslmode: "disable"
+nats:
+  cluster_id: "test-cluster"
+  client_id: "order-service"
+  url: "nats://localhost:4222"

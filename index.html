@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #orderDetails {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: none;
+        }
+        .order-section {
+            margin-bottom: 10px;
+        }
+        .order-section h3 {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Order Viewer</h1>
+<form id="orderForm">
+    <label for="orderId">Enter Order ID:</label>
+    <input type="text" id="orderId" name="orderId" required>
+    <button type="submit">Get Order</button>
+</form>
+
+<div id="orderDetails">
+    <h2>Order Details</h2>
+    <div class="order-section" id="orderInfo">
+        <h3>Order Info</h3>
+        <p><strong>Order UID:</strong> <span id="orderUid"></span></p>
+        <p><strong>Track Number:</strong> <span id="trackNumber"></span></p>
+        <p><strong>Entry:</strong> <span id="entry"></span></p>
+        <p><strong>Locale:</strong> <span id="locale"></span></p>
+        <p><strong>Customer ID:</strong> <span id="customerId"></span></p>
+        <p><strong>Delivery Service:</strong> <span id="deliveryService"></span></p>
+        <p><strong>Date Created:</strong> <span id="dateCreated"></span></p>
+    </div>
+    <div class="order-section" id="deliveryInfo">
+        <h3>Delivery Info</h3>
+        <p><strong>Name:</strong> <span id="deliveryName"></span></p>
+        <p><strong>Phone:</strong> <span id="deliveryPhone"></span></p>
+        <p><strong>Zip:</strong> <span id="deliveryZip"></span></p>
+        <p><strong>City:</strong> <span id="deliveryCity"></span></p>
+        <p><strong>Address:</strong> <span id="deliveryAddress"></span></p>
+        <p><strong>Region:</strong> <span id="deliveryRegion"></span></p>
+        <p><strong>Email:</strong> <span id="deliveryEmail"></span></p>
+    </div>
+    <div class="order-section" id="paymentInfo">
+        <h3>Payment Info</h3>
+        <p><strong>Transaction:</strong> <span id="paymentTransaction"></span></p>
+        <p><strong>Currency:</strong> <span id="paymentCurrency"></span></p>
+        <p><strong>Provider:</strong> <span id="paymentProvider"></span></p>
+        <p><strong>Amount:</strong> <span id="paymentAmount"></span></p>
+        <p><strong>Payment Date:</strong> <span id="paymentDate"></span></p>
+        <p><strong>Bank:</strong> <span id="paymentBank"></span></p>
+        <p><strong>Delivery Cost:</strong> <span id="paymentDeliveryCost"></span></p>
+        <p><strong>Goods Total:</strong> <span id="paymentGoodsTotal"></span></p>
+    </div>
+    <div class="order-section" id="itemsInfo">
+        <h3>Items</h3>
+        <ul id="itemsList"></ul>
+    </div>
+</div>
+
+<script>
+    document.getElementById('orderForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const orderId = document.getElementById('orderId').value;
+        fetchOrder(orderId);
+    });
+
+    function fetchOrder(orderId) {
+        fetch(`http://localhost:8080/order?id=${orderId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Order not found');
+                }
+                return response.json();
+            })
+            .then(data => displayOrder(data))
+            .catch(error => alert(error.message));
+    }
+
+    function displayOrder(order) {
+        document.getElementById('orderUid').textContent = order.order_uid;
+        document.getElementById('trackNumber').textContent = order.track_number;
+        document.getElementById('entry').textContent = order.entry;
+        document.getElementById('locale').textContent = order.locale;
+        document.getElementById('customerId').textContent = order.customer_id;
+        document.getElementById('deliveryService').textContent = order.delivery_service;
+        document.getElementById('dateCreated').textContent = new Date(order.date_created).toLocaleString();
+
+        document.getElementById('deliveryName').textContent = order.delivery.name;
+        document.getElementById('deliveryPhone').textContent = order.delivery.phone;
+        document.getElementById('deliveryZip').textContent = order.delivery.zip;
+        document.getElementById('deliveryCity').textContent = order.delivery.city;
+        document.getElementById('deliveryAddress').textContent = order.delivery.address;
+        document.getElementById('deliveryRegion').textContent = order.delivery.region;
+        document.getElementById('deliveryEmail').textContent = order.delivery.email;
+
+        document.getElementById('paymentTransaction').textContent = order.payment.transaction;
+        document.getElementById('paymentCurrency').textContent = order.payment.currency;
+        document.getElementById('paymentProvider').textContent = order.payment.provider;
+        document.getElementById('paymentAmount').textContent = order.payment.amount;
+        document.getElementById('paymentDate').textContent = new Date(order.payment.payment_dt * 1000).toLocaleString();
+        document.getElementById('paymentBank').textContent = order.payment.bank;
+        document.getElementById('paymentDeliveryCost').textContent = order.payment.delivery_cost;
+        document.getElementById('paymentGoodsTotal').textContent = order.payment.goods_total;
+
+        const itemsList = document.getElementById('itemsList');
+        itemsList.innerHTML = '';
+        order.items.forEach(item => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `Name: ${item.name}, Price: ${item.price}, Total Price: ${item.total_price}, Brand: ${item.brand}`;
+            itemsList.appendChild(listItem);
+        });
+
+        document.getElementById('orderDetails').style.display = 'block';
+    }
+</script>
+</body>
+</html>

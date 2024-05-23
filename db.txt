@@ -1,0 +1,54 @@
+CREATE TABLE orders (
+    order_uid VARCHAR PRIMARY KEY,
+    track_number VARCHAR,
+    entry VARCHAR,
+    locale VARCHAR,
+    internal_signature VARCHAR,
+    customer_id VARCHAR,
+    delivery_service VARCHAR,
+    shardkey VARCHAR,
+    sm_id INT,
+    date_created TIMESTAMP,
+    oof_shard VARCHAR
+);
+
+create table delivery(
+    order_uid varchar primary key references orders(order_uid),
+    name varchar not null,
+    phone varchar not null,
+    zip varchar not null,
+    city varchar not null,
+    address varchar not null,
+    region varchar not null,
+    email varchar not null
+);
+
+create table payment(
+    order_uid varchar references orders(order_uid),
+    transaction varchar,
+    request_id varchar,
+    currency varchar,
+    provider varchar,
+    amount int,
+    payment_dt int,
+    bank varchar,
+    delivery_cost int,
+    goods_total int,
+    custom_fee int
+)
+
+create table item
+(
+    chrt_id      int primary key,
+    order_uid    varchar references orders (order_uid),
+    track_number varchar,
+    price        int,
+    rid          varchar,
+    name         varchar,
+    sale         int,
+    size         varchar,
+    total_price  int,
+    nm_id        int,
+    brand        varchar,
+    status int
+)
